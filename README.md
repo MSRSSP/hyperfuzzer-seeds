@@ -3,23 +3,23 @@
 HyperFuzzer is an efficient hybrid fuzzer for [Microsoft's Hyper-V hypervisor](https://docs.microsoft.com/en-us/windows-server/virtualization/hyper-v/hyper-v-technology-overview).
 HyperFuzzer loads a complete VM state, traces the hypervisor execution using Intel Processor Trace, and continuously
 mutates the VM state based on code coverage and symbolic execution until it hits a critical bug.  HyperFuzzer is deployed
-internally to run on each daily build of Windows, and has found 12 critical hypervisor bugs to date (as of 8/2/2021).
-You can find more technical details of HyperFuzzer in our CCS21 paper.
+inside Microsoft to test daily builds of the Hyper-V hypervisor, and has found 11 critical hypervisor bugs to date (as of 8/2/2021).
+You can find more technical details of HyperFuzzer in our CCS'21 paper.
 
 Please note that HyperFuzzer is _not_ available outside of Microsoft at the moment.  The purpose of this repo is to
-release the fuzzing seeds, which are generic and not specific to Hyper-V, to foster future research on hypervisor fuzzing.
+release the fuzzing seeds which are generic and not specific to Hyper-V to foster future research on hypervisor fuzzing.
 
 # Fuzzing Seeds
 
 This repo contains the fuzzing seeds HyperFuzzer used to drive the testing.  A fuzzing seed is a complete VM state
-(register + memory) which triggers VMEXIT on executing its very first instruction and then dies.  HyperFuzzer
+(register + memory) which triggers VMEXIT on executing its very first instruction and then terminates.  HyperFuzzer
 relies on these fuzzing seeds to cover different functionalities of the hypervisor (e.g., task switch, APIC
 emulation, etc.), and mutates them with the goal to cause crashes or assertion violations.
 
 ## Binary Format
 
-Each fuzzing input has a fixed-sized register region followed by a variable-length physical memory region
-reaching the end of the file.  You can think of the data structure as following:
+Each fuzzing input has a fixed-sized register region followed by a variable-length physical memory region.
+The data format of the fuzzing input file is as follows:
 
 ```
 #pragma pack(1)
@@ -99,7 +99,7 @@ typedef struct _REG_FILE {
 
 ## Seed Generation
 
-We construct the fuzzing seeds using a set of Python2 scripts in the `scripts/` folder:
+We construct the fuzzing seeds by using a set of Python2 scripts in the `scripts/` folder:
 
 * `vmstate.py` defines key x86 data structures and various utility functions to help construct VM states.
 * `example_taskswitch.py` generates VM states to test the hypervisor's emulation of hardware task switch.
